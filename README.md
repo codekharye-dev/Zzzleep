@@ -71,3 +71,5 @@ Hər məkan üçün 6 müxtəlif farazi qonağın rəyi var. Qiymətlər görün
 **zlpy ai** bu versiyada yerli, deterministik rəy bələdçisidir. Xarici LLM və ya AI API-si qoşulmayıb və şəbəkəyə sual/rəy göndərilmir. `reviews.ts` daxilindəki rəylərin mövzu və sentiment etiketləri sayılır; `reviewSummary.ts` yalnız bu sübutlara əsaslanan xülasə və mənbə keçidləri qaytarır. Köməkçi əvvəlcədən hazırlanmış sualları və mövzu açar sözlərini tanıyır; dəstəklənməyən suallara sərhədlərini bildirir. Balın mövzular üzrə dəqiq nə qədər azaldığını iddia etmir. Tam generativ AI ayrıca server və təhlükəsiz API inteqrasiyası tələb edir. Bu məhdudiyyətlər interfeysdə “Xülasə necə hazırlanır?” bölməsində açıqlanır.
 
 Kartlarda görünüşə daxilolma, hover və seçilmişə əlavəetmə animasiyaları var; `prefers-reduced-motion` seçiminə hörmət edilir. Loqo sadə Z monoqramı ilə yenilənib.
+
+GitHub Pages hələ `Deploy from a branch` rejimindədirsə, yayımlama axını eyni commit üçün yerli Pages prosesinin bitməsini gözləyir və Vite build-ini sonda yerləşdirir. Beləliklə mənbə HTML/TSX faylları hazır tətbiqin üzərinə yazılmır. `GitHub Actions` mənbə rejimində bu gözləmə avtomatik ötürülür.
