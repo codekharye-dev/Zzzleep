@@ -50,6 +50,13 @@ import ListingDetail from "./ListingDetail";
 import { CompareView, SplitView } from "./Extras";
 import { todayISO, validateBooking } from "./booking";
 import { extraCopy } from "./content";
+import { experienceCopy } from "./experienceContent";
+const Experiences = lazy(() => import("./Experiences"));
+const ExperiencePreview = lazy(() =>
+  import("./Experiences").then((module) => ({
+    default: module.ExperiencePreview,
+  })),
+);
 
 const asset = (path: string) =>
   `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
@@ -299,6 +306,10 @@ function App() {
         );
   const isSearch = route === "/search" || !!routeCountry;
   const isHome = route === "/";
+  const isExperiences =
+    route === "/experiences" ||
+    route.startsWith("/experiences?") ||
+    route.startsWith("/experience/");
   const result = listings
     .filter(
       (l) =>
@@ -478,6 +489,9 @@ function App() {
               >
                 {t("discover")}
               </a>
+              <a className={isExperiences ? "active" : ""} href="#/experiences">
+                {experienceCopy[safeLang].nav}
+              </a>
               <button className="world-nav-link" onClick={openWorld}>
                 <Globe2 size={14} />
                 {worldCopy[safeLang].nav}
@@ -560,6 +574,7 @@ function App() {
           {menu && (
             <nav className="mobile-menu" onClick={() => setMenu(false)}>
               <a href="#/">{t("discover")}</a>
+              <a href="#/experiences">{experienceCopy[safeLang].nav}</a>
               <button onClick={openWorld}>
                 <Globe2 size={16} />
                 {worldCopy[safeLang].nav}
@@ -896,6 +911,11 @@ function App() {
             </section>
           )}
           {isHome && (
+            <Suspense fallback={null}>
+              <ExperiencePreview lang={safeLang} />
+            </Suspense>
+          )}
+          {isHome && (
             <>
               <Suspense fallback={<div className="world-loading container" />}>
                 <WorldDiscovery lang={safeLang} onSelect={selectCountry} />
@@ -1039,6 +1059,11 @@ function App() {
               </section>
             </>
           )}
+          {isExperiences && (
+            <Suspense fallback={<div className="experience-route-loading" />}>
+              <Experiences lang={safeLang} route={route} onNavigate={go} />
+            </Suspense>
+          )}
           {selected && (
             <div className="container detail-container">
               <ListingDetail
@@ -1093,6 +1118,7 @@ function App() {
           {!isHome &&
             !isSearch &&
             !isFavorites &&
+            !isExperiences &&
             !selected &&
             route !== "/compare" &&
             route !== "/split" && (
@@ -1169,6 +1195,7 @@ function App() {
               <a href="#/search" onClick={() => reset()}>
                 {t("viewAll")}
               </a>
+              <a href="#/experiences">{experienceCopy[safeLang].nav}</a>
               <a href="#/favorites">{t("favorites")}</a>
               <a href="#/compare">{t("compare")}</a>
             </div>
@@ -1194,7 +1221,7 @@ function App() {
                 : safeLang === "en"
                   ? "Azerbaijan"
                   : "Азербайджан"}{" "}
-              <span>·</span> AZN ₼
+              <span>·</span> {isExperiences ? "USD $" : "AZN ₼"}
             </span>
           </div>
           <div className="demo-notice">

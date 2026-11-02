@@ -141,3 +141,75 @@ test("review summary counts and citations only use actual source reviews", async
     0,
   );
 });
+
+test("experience data has localized activities, valid menus and exact USD totals", async () => {
+  const {
+    experiences,
+    experienceCountries,
+    experienceTotal,
+    validateExperienceSelection,
+  } = await import("../src/experiences.ts");
+  assert.equal(experiences.length, 8);
+  assert.equal(experienceCountries.length, 6);
+  assert.equal(new Set(experiences.map((e) => e.id)).size, 8);
+  for (const e of experiences) {
+    assert.ok(existsSync(new URL(`../public${e.hero}`, import.meta.url)));
+    assert.equal(
+      e.steps.reduce((sum, s) => sum + s.minutes, 0),
+      e.duration,
+    );
+    assert.ok(e.maxGuests >= 2);
+    assert.ok(e.price > 0);
+    for (const lang of ["az", "en", "ru"]) {
+      assert.ok(e.title[lang]);
+      assert.ok(e.description[lang]);
+    }
+    for (const d of e.menu || []) {
+      assert.ok(existsSync(new URL(`../public${d.image}`, import.meta.url)));
+      for (const lang of ["az", "en", "ru"]) {
+        assert.ok(d.name[lang]);
+        assert.ok(d.description[lang]);
+      }
+    }
+  }
+  const china = experiences.find((e) => e.id === "beijing-wok"),
+    sheki = experiences.find((e) => e.id === "sheki-cable");
+  assert.equal(china.price, 200);
+  assert.equal(experienceTotal(china, 3), 600);
+  assert.equal(sheki.price, 23);
+  assert.equal(sheki.concept, true);
+  assert.equal(experienceTotal(sheki, 2), 46);
+  const selection = {
+    date: "2027-05-10",
+    time: "14:00",
+    people: 2,
+    today: "2027-05-01",
+    nowMinutes: 600,
+  };
+  assert.equal(validateExperienceSelection(china, selection), null);
+  assert.equal(
+    validateExperienceSelection(china, { ...selection, date: "2027-02-30" }),
+    "dateError",
+  );
+  assert.equal(
+    validateExperienceSelection(china, { ...selection, date: "2020-01-01" }),
+    "dateError",
+  );
+  assert.equal(
+    validateExperienceSelection(china, { ...selection, time: "99:99" }),
+    "timeError",
+  );
+  assert.equal(
+    validateExperienceSelection(china, { ...selection, people: 9 }),
+    "peopleError",
+  );
+  assert.equal(
+    validateExperienceSelection(china, {
+      ...selection,
+      date: "2027-05-01",
+      time: "10:00",
+      nowMinutes: 660,
+    }),
+    "sameDayError",
+  );
+});

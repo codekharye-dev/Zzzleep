@@ -73,3 +73,9 @@ Hər məkan üçün 6 müxtəlif farazi qonağın rəyi var. Qiymətlər görün
 Kartlarda görünüşə daxilolma, hover və seçilmişə əlavəetmə animasiyaları var; `prefers-reduced-motion` seçiminə hörmət edilir. Loqo sadə Z monoqramı ilə yenilənib.
 
 GitHub Pages hələ `Deploy from a branch` rejimindədirsə, yayımlama axını eyni commit üçün yerli Pages prosesinin bitməsini gözləyir və Vite build-ini sonda yerləşdirir. Beləliklə mənbə HTML/TSX faylları hazır tətbiqin üzərinə yazılmır. `GitHub Actions` mənbə rejimində bu gözləmə avtomatik ötürülür.
+
+## Təcrübələr / Experiences
+
+`#/experiences` ayrıca fəaliyyət kataloqudur: 6 ölkə üzrə 8 nümunə təcrübə, ölkə/kateqoriya/axtarış/qiymət filtrləri, USD ilə nəfər başına qiymət və ətraflı proqramlar. `#/experience/beijing-wok` ($200) və `#/experience/new-york-flavors` ($125) səhifələrində istifadəçinin təqdim etdiyi yemək lenti komponenti Çin wok dadımlarına və Amerika menyusuna uyğunlaşdırılıb. Yemək seçimi sınaq dadım planına əlavə olunur; ayrıca yemək sifarişi və ya əlavə ödəniş yaratmır. Sheki kanat fəaliyyəti ($23) real operatoru təsdiqləməyən konsept kimi işarələnib.
+
+Tarix, saat və qrup tutumu yoxlanan planlar `zzzlep-experience-plans` lokal yaddaşında saxlanır. Real bilet, rezervasiya, yer təsdiqi və ödəniş yoxdur. Qalma məkanları AZN, təcrübələr isə açıq şəkildə USD ilə göstərilir. Komponent `src/components/ui/sushi-conveyor-menu.tsx` daxilindədir; əlavə NPM asılılığı tələb etmədi. Təcrübə səhifələri və yemək lenti ayrıca hissələr kimi yüklənir.
