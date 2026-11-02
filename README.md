@@ -31,7 +31,7 @@ Sayt Azərbaycan dilində açılır. Dil və açıq/qaranlıq rejim seçimi brau
 ```sh
 npm test          # Qiymət, tarix, tutum, kataloq və tərcümə yoxlamaları
 npm run build    # TypeScript + production build
-npm run test:e2e # 11 Chromium brauzer sınağı
+npm run test:e2e # 15 Chromium brauzer sınağı
 npm run preview  # Hazır build-i lokal yoxlamaq
 ```
 
@@ -63,3 +63,11 @@ Bu frontend nümayiş layihəsidir. Bütün məkanlar, qiymətlər, ev sahiblər
 Qlobus sürüşdürməklə fırlanır; hər ölkənin bayrağı və ya ölkə düyməsi `#/country/TR` kimi ayrıca nəticə görünüşünü açır. Oxlar aktiv ölkə kartını dəyişir; kartdakı keçid həmin ölkənin evlərini göstərir. Ölkə seçimi səhifə yenilənəndə URL vasitəsilə qalır. Xarici məkanlar da filtr, seçilmişlər, müqayisə, rezervasiya və büdcə axınlarında işləyir. Bütün qiymətlər AZN ilədir.
 
 Komponent `src/components/ui` daxilində saxlanır. Özündə React və Cobe xaricində shadcn komponentləri import etmir; əlavə CLI ilə layihəni yenidən yaratmaq tələb olunmur. Tailwind Vite plaqini və `src/globe-theme.css` mövcud dizaynın rənglərinə bağlanır. Qlobus ayrıca JS hissəsi kimi yüklənir və WebGL olmadıqda sadə qlobus təsviri ilə işlək ölkə düymələri qalır. Azaldılmış animasiya seçimində avtomatik fırlanma dayanır; ekran xaricində rəsm dövrəsi pauza edilir. Bayraqlar lokal SVG fayllarıdır.
+
+## Rəylər və zlpy ai
+
+Hər məkan üçün 6 müxtəlif farazi qonağın rəyi var. Qiymətlər görünən rəylərin riyazi ortasından alınır; elan kartı, detallar, müqayisə və büdcə eyni reytinqi göstərir. Kataloqda əla, yaxşı və orta qiymətləndirilən məkanlar mövcuddur. “Qonaqların sevimlisi” nişanı yalnız 4.7 və daha yüksək reytinqdə göstərilir. Rəylər müsbət/irad filtrləri və tarix/xal sıralaması ilə oxunur.
+
+**zlpy ai** bu versiyada yerli, deterministik rəy bələdçisidir. Xarici LLM və ya AI API-si qoşulmayıb və şəbəkəyə sual/rəy göndərilmir. `reviews.ts` daxilindəki rəylərin mövzu və sentiment etiketləri sayılır; `reviewSummary.ts` yalnız bu sübutlara əsaslanan xülasə və mənbə keçidləri qaytarır. Köməkçi əvvəlcədən hazırlanmış sualları və mövzu açar sözlərini tanıyır; dəstəklənməyən suallara sərhədlərini bildirir. Balın mövzular üzrə dəqiq nə qədər azaldığını iddia etmir. Tam generativ AI ayrıca server və təhlükəsiz API inteqrasiyası tələb edir. Bu məhdudiyyətlər interfeysdə “Xülasə necə hazırlanır?” bölməsində açıqlanır.
+
+Kartlarda görünüşə daxilolma, hover və seçilmişə əlavəetmə animasiyaları var; `prefers-reduced-motion` seçiminə hörmət edilir. Loqo sadə Z monoqramı ilə yenilənib.

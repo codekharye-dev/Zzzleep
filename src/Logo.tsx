@@ -1,13 +1,14 @@
 import { useId } from "react";
+/** A compact folded-Z monogram: one recognizable silhouette at small sizes. */
 export default function Logo() {
   const id = useId();
   return (
-    <span className="logo logo-refined">
+    <span className="logo logo-refined logo-signature">
       <svg
         className="brand-mark"
-        viewBox="0 0 48 48"
         width="43"
         height="43"
+        viewBox="0 0 48 48"
         fill="none"
         aria-hidden="true"
       >
@@ -16,33 +17,32 @@ export default function Logo() {
             id={id}
             x1="5"
             y1="2"
-            x2="43"
+            x2="44"
             y2="48"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="#8570ec" />
-            <stop offset="1" stopColor="#4435b6" />
+            <stop stopColor="#7160da" />
+            <stop offset="1" stopColor="#3e319e" />
           </linearGradient>
         </defs>
-        <rect x="1" y="1" width="46" height="46" rx="15" fill={`url(#${id})`} />
+        <rect x="2" y="2" width="44" height="44" rx="14" fill={`url(#${id})`} />
         <path
-          d="m11 26 12-11 13 11M15 24v12h19V24"
+          d="M14 15.5h20.5L14 33h20.5"
           stroke="white"
-          strokeWidth="2.4"
+          strokeWidth="4.8"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
-          d="M21 27h8l-8 6h8"
-          stroke="white"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d="m36.5 7.5 1.4 4.1 4.1 1.4-4.1 1.4-1.4 4.1-1.4-4.1-4.1-1.4 4.1-1.4z"
+          fill="#e9d3aa"
         />
-        <path d="M34 9a5.5 5.5 0 0 0 6 7 5.5 5.5 0 1 1-6-7Z" fill="#f8d78c" />
         <path
-          d="m13 10 .7 2.3L16 13l-2.3.7L13 16l-.7-2.3L10 13l2.3-.7Z"
-          fill="#d5c9ff"
+          d="m16 30 14-12"
+          stroke="#d9d2ff"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+          opacity=".65"
         />
       </svg>
       <span className="brand-type">

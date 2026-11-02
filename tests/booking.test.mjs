@@ -80,3 +80,64 @@ test("five country collections contain 40 unique, localized stays", async () => 
     for (const lang of ["az", "en", "ru"]) assert.ok(l.title[lang]);
   }
 });
+
+test("review-backed ratings are consistent and include excellent and average homes", async () => {
+  const { catalog } = await import("../src/countries.ts");
+  const { getListingReviews, analyzeReviews } =
+    await import("../src/reviews.ts");
+  const authors = new Set();
+  for (const listing of catalog) {
+    const reviews = getListingReviews(listing.id);
+    const summary = analyzeReviews(reviews);
+    assert.equal(summary.count, listing.reviews);
+    assert.equal(summary.average, listing.rating);
+    assert.equal(new Set(reviews.map((r) => r.author)).size, reviews.length);
+    assert.equal(new Set(reviews.map((r) => r.text.az)).size, reviews.length);
+    assert.equal(typeof listing.host, "string");
+    for (const r of reviews) {
+      authors.add(r.author);
+      assert.ok(r.rating >= 1 && r.rating <= 5);
+      for (const lang of ["az", "en", "ru"]) assert.ok(r.text[lang]);
+    }
+  }
+  assert.ok(authors.size >= 16);
+  assert.ok(catalog.some((l) => l.rating < 3.5));
+  assert.ok(catalog.some((l) => l.rating >= 4.7));
+});
+test("review summary counts and citations only use actual source reviews", async () => {
+  const { getListingReviews, analyzeReviews } =
+    await import("../src/reviews.ts");
+  const { summarizeReviews } = await import("../src/reviewSummary.ts");
+  const reviews = getListingReviews("quba-01"),
+    summary = analyzeReviews(reviews);
+  assert.equal(summary.criticalCount, 4);
+  assert.equal(summary.average, 3.17);
+  assert.equal(
+    summary.distribution.reduce((sum, row) => sum + row.count, 0),
+    reviews.length,
+  );
+  for (const bucket of ["positive", "negative"])
+    for (const topic of summary[bucket]) {
+      assert.equal(topic.count, topic.reviewIds.length);
+      for (const id of topic.reviewIds)
+        assert.ok(
+          reviews
+            .find((r) => r.id === id)
+            .mentions.some(
+              (m) => m.topic === topic.topic && m.sentiment === bucket,
+            ),
+        );
+    }
+  for (const lang of ["az", "en", "ru"])
+    for (const mode of ["summary", "liked", "concerns", "reasons", "fit"]) {
+      const reply = summarizeReviews(reviews, lang, mode);
+      assert.ok(reply.text);
+      for (const id of reply.evidenceIds)
+        assert.ok(reviews.some((r) => r.id === id));
+    }
+  assert.equal(
+    summarizeReviews(reviews, "az", "summary", "Marsda hava necədir?")
+      .evidenceIds.length,
+    0,
+  );
+});

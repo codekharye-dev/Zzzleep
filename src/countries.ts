@@ -1,3 +1,4 @@
+import { reviewedScore } from "./reviews.ts";
 import { listings } from "./data.ts";
 import type { Listing, LocalizedText } from "./data.ts";
 export type CountryCode = "AZ" | "TR" | "US" | "IT" | "JP";
@@ -282,8 +283,7 @@ export const internationalListings: Listing[] = seeds.map(
       guests,
       bedrooms: guests > 4 ? 3 : guests > 2 ? 2 : 1,
       beds: guests > 4 ? 4 : guests > 2 ? 3 : 1,
-      reviews: 18 + index * 3,
-      rating: 4.85 + (index % 10) / 100,
+      ...reviewedScore(`${country.toLowerCase()}-${index + 1}`),
       host: ["Deniz", "Alex", "Luca", "Haru"][Math.floor(index / 4)],
     };
   },

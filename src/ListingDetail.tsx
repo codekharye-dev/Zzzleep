@@ -29,6 +29,7 @@ import type { Listing } from "./data";
 import type { Lang } from "./i18n";
 import { addDays, bookingPrice, todayISO, validateBooking } from "./booking";
 import "./detail.css";
+import ListingReviews from "./ListingReviews";
 
 const copy = {
   az: {
@@ -79,10 +80,6 @@ const copy = {
     close: "Bağla",
     previous: "Əvvəlki şəkil",
     next: "Növbəti şəkil",
-    reviewText:
-      "Çox rahat və gözəl bir məkan idi. Təmizlik, sakitlik və düşünülmüş detallar səfərimizi daha da xüsusi etdi. Yenidən gəlmək istərdik!",
-    reviewAuthor: "Aysel",
-    reviewDate: "Sentyabr 2026 · Farazi rəy",
     trustTitle: "Rahatlıq detallarda gizlidir",
     trustText: "Özünüzə aid bir məkan. Yaxşı yuxu. Gözəl bir səfər.",
     special: "Zzzlep seçimi",
@@ -146,10 +143,6 @@ const copy = {
     close: "Close",
     previous: "Previous photo",
     next: "Next photo",
-    reviewText:
-      "Such a lovely and comfortable place. The cleanliness, quiet surroundings, and thoughtful details made our trip feel special. We would love to come back!",
-    reviewAuthor: "Aysel",
-    reviewDate: "September 2026 · Fictional review",
     trustTitle: "Comfort is in the details",
     trustText: "A place of your own. A good night’s sleep. A wonderful trip.",
     special: "Zzzlep selection",
@@ -213,10 +206,6 @@ const copy = {
     close: "Закрыть",
     previous: "Предыдущее фото",
     next: "Следующее фото",
-    reviewText:
-      "Очень уютное и красивое место. Чистота, тишина и продуманные детали сделали нашу поездку особенной. С удовольствием вернулись бы снова!",
-    reviewAuthor: "Айсель",
-    reviewDate: "Сентябрь 2026 · Вымышленный отзыв",
     trustTitle: "Уют в каждой детали",
     trustText: "Место для себя. Крепкий сон. Прекрасное путешествие.",
     special: "Выбор Zzzlep",
@@ -488,7 +477,8 @@ export default function ListingDetail({
                 {c.hosted}: {listing.host}
               </strong>
               <small>
-                {c.fictional} · {c.superhost}
+                {c.fictional}
+                {listing.rating >= 4.7 ? ` · ${c.superhost}` : ""}
               </small>
             </div>
             <ShieldCheck size={25} />
@@ -528,25 +518,7 @@ export default function ListingDetail({
               })}
             </div>
           </section>
-          <section className="detail-section">
-            <h2 className="detail-rating-heading">
-              <Star size={21} fill="currentColor" /> {listing.rating.toFixed(2)}{" "}
-              <span>
-                · {listing.reviews} {c.reviews}
-              </span>
-            </h2>
-            <div className="detail-review">
-              <div className="detail-review-person">
-                <span className="detail-avatar detail-avatar-review">A</span>
-                <span>
-                  <strong>{c.reviewAuthor}</strong>
-                  <small>{c.reviewDate}</small>
-                </span>
-                <span className="detail-review-stars">★★★★★</span>
-              </div>
-              <p>{c.reviewText}</p>
-            </div>
-          </section>
+          <ListingReviews listing={listing} lang={lang} />
           <section className="detail-section">
             <h2>{c.rules}</h2>
             <p>{c.rulesText}</p>

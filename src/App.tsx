@@ -274,15 +274,17 @@ function App() {
     const scroll = () => {
       const section = document.getElementById("world");
       if (!section) return false;
-      section.scrollIntoView({behavior:"smooth"});
+      section.scrollIntoView({ behavior: "smooth" });
       setWorldRequested(false);
       return true;
     };
     if (scroll()) return;
-    const observer = new MutationObserver(() => { if(scroll()) observer.disconnect(); });
-    observer.observe(document.body,{childList:true,subtree:true});
+    const observer = new MutationObserver(() => {
+      if (scroll()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
-  }, [worldRequested,route]);
+  }, [worldRequested, route]);
   const countryName = (code: string) =>
     countryFor(code)?.name[safeLang] || code;
   const availableCities =
@@ -317,6 +319,40 @@ function App() {
             ? b.rating - a.rating
             : 0,
     );
+  const visibleCards = result
+    .slice(0, limit)
+    .map((item) => item.id)
+    .join(",");
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cards = document.querySelectorAll<HTMLElement>(
+      ".stay-card:not([data-revealed])",
+    );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const card = entry.target as HTMLElement;
+            card.dataset.enter = "shown";
+            card.dataset.revealed = "true";
+            observer.unobserve(card);
+          }
+        }
+      },
+      { threshold: 0.08 },
+    );
+    cards.forEach((card, index) => {
+      card.style.setProperty("--enter-delay", `${(index % 4) * 60}ms`);
+      card.dataset.enter = "pending";
+      observer.observe(card);
+    });
+    return () => {
+      observer.disconnect();
+      cards.forEach((card) => {
+        if (!card.dataset.revealed) card.dataset.enter = "shown";
+      });
+    };
+  }, [visibleCards, route]);
   const selected = route.startsWith("/listing/")
     ? listings.find((l) => l.id === route.split("/")[2])
     : undefined;
@@ -373,7 +409,7 @@ function App() {
             loading={i < 4 ? "eager" : "lazy"}
           />
         </a>
-        {i % 3 !== 2 && (
+        {l.rating >= 4.7 && (
           <span className="guest-favorite">
             <BadgeCheck size={13} />
             {t("topChoice")}
@@ -1016,7 +1052,13 @@ function App() {
                 favorite={favorites.includes(selected.id)}
                 onFavorite={() => toggleFavorite(selected.id)}
                 onCompare={() => toggleCompare(selected.id)}
-                onBack={() => go(selected.country === "AZ" ? "/search" : `/country/${selected.country}`)}
+                onBack={() =>
+                  go(
+                    selected.country === "AZ"
+                      ? "/search"
+                      : `/country/${selected.country}`,
+                  )
+                }
               />
             </div>
           )}

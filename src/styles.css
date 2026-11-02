@@ -2646,3 +2646,6 @@ svg {
 [data-theme="dark"] .search-submit,
 [data-theme="dark"] .email-input > button { color: #19132e; }
 .stay-meta>span:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.stay-meta>span:first-child>svg{display:inline-block;vertical-align:middle;margin-right:4px}.stay-meta .stay-rating{flex-shrink:0}
+.stay-card{animation:none;transition:opacity .6s ease,transform .45s cubic-bezier(.2,.7,.3,1)}.stay-card[data-enter=pending]{opacity:0;transform:translateY(18px)}.stay-card[data-enter=shown]{opacity:1;transform:translateY(0);transition-delay:var(--enter-delay,0ms)}.stay-card[data-enter=shown]:hover,.stay-card:hover{transform:translateY(-4px);transition-delay:0s}.stay-image{transition:box-shadow .3s}.stay-card:hover .stay-image{box-shadow:0 9px 22px #25213913}.heart-button.is-saved svg{animation:heart-pop .32s ease-out}.stay-price>a svg{transition:transform .2s}.stay-price>a:hover svg{transform:translate(1px,-1px)}
+@keyframes heart-pop{0%{transform:scale(.85)}55%{transform:scale(1.23)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.stay-card[data-enter=pending],.stay-card[data-enter=shown],.stay-card:hover{opacity:1;transform:none}.stay-card{transition:none}}

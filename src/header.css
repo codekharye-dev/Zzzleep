@@ -261,3 +261,23 @@
     font-size: 28px;
   }
 }
+.logo-signature .brand-type > span {
+  font-weight: 720;
+  letter-spacing: -1.55px;
+}
+.logo-signature .brand-type > small {
+  letter-spacing: 1.5px;
+  font-size: 6.5px;
+}
+.logo-signature .brand-mark {
+  filter: drop-shadow(0 3px 5px #4338ca12);
+}
+.brand:hover .logo-signature .brand-mark {
+  transform: translateY(-1px);
+}
+@media (max-width: 640px) {
+  .logo-signature .brand-type > small {
+    font-size: 5.5px;
+    letter-spacing: 1.15px;
+  }
+}
