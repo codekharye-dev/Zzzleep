@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
   ArrowDown,
@@ -37,7 +37,12 @@ import {
   Building2,
   BadgeCheck,
 } from "lucide-react";
-import { listings as sourceListings, cities } from "./data";
+import { cities } from "./data";
+import { catalog as sourceListings, countries, countryFor } from "./countries";
+import type { CountryCode } from "./countries";
+import Logo from "./Logo";
+import { worldCopy } from "./worldContent";
+const WorldDiscovery = lazy(() => import("./WorldDiscovery"));
 import type { Listing } from "./data";
 import { translations } from "./i18n";
 import type { Lang } from "./i18n";
@@ -46,9 +51,11 @@ import { CompareView, SplitView } from "./Extras";
 import { todayISO, validateBooking } from "./booking";
 import { extraCopy } from "./content";
 
-const asset = (path: string) => `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
-const listings: Listing[] = sourceListings.map(listing => ({
-  ...listing, images: listing.images.map(asset),
+const asset = (path: string) =>
+  `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
+const listings: Listing[] = sourceListings.map((listing) => ({
+  ...listing,
+  images: listing.images.map(asset),
 }));
 const categories = [
   { id: "all", icon: Compass },
@@ -65,9 +72,11 @@ function useStored<T>(key: string, initial: T) {
       if (!stored) return initial;
       const parsed: unknown = JSON.parse(stored);
       if (Array.isArray(initial)) {
-        return (Array.isArray(parsed)
-          ? parsed.filter((item) => typeof item === "string")
-          : initial) as T;
+        return (
+          Array.isArray(parsed)
+            ? parsed.filter((item) => typeof item === "string")
+            : initial
+        ) as T;
       }
       return typeof parsed === typeof initial ? (parsed as T) : initial;
     } catch {
@@ -83,17 +92,6 @@ function useStored<T>(key: string, initial: T) {
   }, [key, value]);
   return [value, setValue] as const;
 }
-function Logo() {
-  return (
-    <span className="logo">
-      <span className="logo-symbol">
-        <Moon size={31} strokeWidth={2.1} />
-        <span className="logo-star">✦</span>
-      </span>
-      zzzlep<span className="logo-dot">.</span>
-    </span>
-  );
-}
 function App() {
   const [lang, setLang] = useStored<Lang>("zzzlep-language", "az");
   const [dark, setDark] = useStored("zzzlep-dark", false);
@@ -101,6 +99,13 @@ function App() {
   const [compared, setCompared] = useStored<string[]>("zzzlep-compared", []);
   const [route, setRoute] = useState(location.hash.slice(1) || "/");
   const [menu, setMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [worldRequested, setWorldRequested] = useState(false);
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 16);
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
   const [languageMenu, setLanguageMenu] = useState(false);
   const [city, setCity] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -229,7 +234,7 @@ function App() {
     setSort("recommended");
   };
   useEffect(() => {
-    if (route === "/favorites") reset();
+    if (route === "/favorites" || route === "/") reset();
   }, [route]);
   const onSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -248,15 +253,55 @@ function App() {
     }
     setSearchError("");
     setLimit(8);
-    go("/search");
+    go(route.startsWith("/country/") ? route : "/search");
   };
   const isFavorites = route === "/favorites";
-  const isSearch = route === "/search";
+  const routeCountry = route.startsWith("/country/")
+    ? countryFor(route.split("/")[2])
+    : undefined;
+  const country = routeCountry || countryFor("AZ")!;
+  const selectCountry = (code: CountryCode) => {
+    reset();
+    go(`/country/${code}`);
+  };
+  const openWorld = () => {
+    setWorldRequested(true);
+    if (route !== "/") go("/");
+    setMenu(false);
+  };
+  useEffect(() => {
+    if (!worldRequested || route !== "/") return;
+    const scroll = () => {
+      const section = document.getElementById("world");
+      if (!section) return false;
+      section.scrollIntoView({behavior:"smooth"});
+      setWorldRequested(false);
+      return true;
+    };
+    if (scroll()) return;
+    const observer = new MutationObserver(() => { if(scroll()) observer.disconnect(); });
+    observer.observe(document.body,{childList:true,subtree:true});
+    return () => observer.disconnect();
+  }, [worldRequested,route]);
+  const countryName = (code: string) =>
+    countryFor(code)?.name[safeLang] || code;
+  const availableCities =
+    country.code === "AZ"
+      ? cities
+      : Array.from(
+          new Set(
+            listings
+              .filter((l) => l.country === country.code)
+              .map((l) => l.city),
+          ),
+        );
+  const isSearch = route === "/search" || !!routeCountry;
   const isHome = route === "/";
   const result = listings
     .filter(
       (l) =>
         (!isFavorites || favorites.includes(l.id)) &&
+        (isFavorites || l.country === country.code) &&
         (!city || l.city === city) &&
         (category === "all" || l.type === category) &&
         l.price <= maxPrice &&
@@ -359,12 +404,7 @@ function App() {
       <div className="stay-meta">
         <span>
           <MapPin size={13} />
-          {cityName(l.city)},{" "}
-          {safeLang === "az"
-            ? "Azərbaycan"
-            : safeLang === "en"
-              ? "Azerbaijan"
-              : "Азербайджан"}
+          {cityName(l.city)}, {countryName(l.country)}
         </span>
         <span className="stay-rating">
           <Star size={13} fill="currentColor" />
@@ -390,7 +430,7 @@ function App() {
   return (
     <>
       <div className="site-shell">
-        <header className="header">
+        <header className={`header ${scrolled ? "is-scrolled" : ""}`}>
           <div className="header-inner">
             <a className="brand" href="#/" aria-label="Zzzlep">
               <Logo />
@@ -402,6 +442,10 @@ function App() {
               >
                 {t("discover")}
               </a>
+              <button className="world-nav-link" onClick={openWorld}>
+                <Globe2 size={14} />
+                {worldCopy[safeLang].nav}
+              </button>
               <a className={isFavorites ? "active" : ""} href="#/favorites">
                 {t("favorites")}
                 {favorites.length > 0 && (
@@ -480,6 +524,10 @@ function App() {
           {menu && (
             <nav className="mobile-menu" onClick={() => setMenu(false)}>
               <a href="#/">{t("discover")}</a>
+              <button onClick={openWorld}>
+                <Globe2 size={16} />
+                {worldCopy[safeLang].nav}
+              </button>
               <a href="#/favorites">
                 {t("favorites")} ({favorites.length})
               </a>
@@ -592,7 +640,7 @@ function App() {
                       onChange={(e) => setCity(e.target.value)}
                     >
                       <option value="">{t("searchHint")}</option>
-                      {cities.map((c) => (
+                      {availableCities.map((c) => (
                         <option key={c} value={c}>
                           {cityName(c)}
                         </option>
@@ -692,6 +740,23 @@ function App() {
               </div>
             </div>
           )}
+          {isSearch && (
+            <nav
+              className="country-result-tabs container"
+              aria-label={worldCopy[safeLang].browse}
+            >
+              {countries.map((item) => (
+                <button
+                  key={item.code}
+                  className={country.code === item.code ? "active" : ""}
+                  onClick={() => selectCountry(item.code)}
+                >
+                  <img src={asset(item.image)} alt="" />
+                  {item.name[safeLang]}
+                </button>
+              ))}
+            </nav>
+          )}
           {(isHome || isSearch || isFavorites) && (
             <section className="listings-section container" ref={resultsRef}>
               <div className="section-heading">
@@ -700,14 +765,16 @@ function App() {
                     {isFavorites
                       ? t("favorites")
                       : isSearch
-                        ? t("explore")
+                        ? routeCountry
+                          ? worldCopy[safeLang].nav
+                          : t("explore")
                         : t("curated")}
                   </span>
                   <h2>
                     {isFavorites
                       ? t("savedTitle")
                       : isSearch
-                        ? `${city ? cityName(city) : t("anywhere")} · ${result.length} ${t("results")}`
+                        ? `${city ? cityName(city) : country.name[safeLang]} · ${result.length} ${t("results")}`
                         : t("staysTitle")}
                   </h2>
                   <p>
@@ -794,6 +861,9 @@ function App() {
           )}
           {isHome && (
             <>
+              <Suspense fallback={<div className="world-loading container" />}>
+                <WorldDiscovery lang={safeLang} onSelect={selectCountry} />
+              </Suspense>
               <section className="destinations-section">
                 <div className="container">
                   <div className="section-heading">
@@ -946,7 +1016,7 @@ function App() {
                 favorite={favorites.includes(selected.id)}
                 onFavorite={() => toggleFavorite(selected.id)}
                 onCompare={() => toggleCompare(selected.id)}
-                onBack={() => go("/search")}
+                onBack={() => go(selected.country === "AZ" ? "/search" : `/country/${selected.country}`)}
               />
             </div>
           )}

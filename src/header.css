@@ -1,0 +1,263 @@
+.header {
+  height: 94px;
+  transition:
+    box-shadow 0.25s,
+    background 0.25s;
+}
+.header.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  box-shadow: 0 4px 24px #30234409;
+  backdrop-filter: blur(16px);
+}
+.header-inner {
+  gap: 22px;
+}
+.logo-refined {
+  gap: 11px;
+  letter-spacing: -1.8px;
+  color: var(--primary);
+}
+.brand-mark {
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 5px #5143cf18);
+  transition: transform 0.25s;
+}
+.brand:hover .brand-mark {
+  transform: rotate(-5deg);
+}
+.brand-type {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.brand-type > span {
+  font-size: 31px;
+  font-weight: 770;
+  line-height: 0.9;
+  letter-spacing: -1.6px;
+}
+.brand-period {
+  color: #a99be8;
+}
+.brand-type > small {
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 1.35px;
+  color: var(--muted);
+  line-height: 1;
+  text-transform: uppercase;
+}
+.desktop-nav {
+  height: 45px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  gap: 2px;
+  margin-left: 0;
+  background: var(--soft);
+}
+.desktop-nav > a,
+.desktop-nav > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+  padding: 0 14px;
+  font-size: 11px;
+  border-radius: 999px;
+  gap: 7px;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.desktop-nav > a.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 7px #3023440b;
+}
+.desktop-nav > a.active:after {
+  display: none;
+}
+.desktop-nav > a:hover,
+.desktop-nav > button:hover {
+  color: var(--primary);
+}
+.desktop-nav .nav-count {
+  background: var(--primary);
+  color: var(--bg);
+  font-size: 8px;
+  border-radius: 50%;
+  padding: 3px;
+  min-width: 15px;
+  display: grid;
+  place-items: center;
+}
+.host-link {
+  font-size: 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 11px 13px;
+  gap: 7px;
+  min-height: 39px;
+  transition: border-color 0.2s;
+}
+.host-link:hover {
+  border-color: var(--primary);
+}
+.header-actions {
+  gap: 14px;
+}
+.language-button {
+  min-height: 40px;
+  font-size: 10px;
+  gap: 5px;
+}
+.theme-button {
+  width: 35px;
+  height: 35px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  min-height: 35px;
+}
+.theme-button:hover {
+  border-color: var(--primary);
+}
+.footer-brand .logo-refined {
+  gap: 9px;
+}
+.footer-brand .brand-mark {
+  width: 34px;
+  height: 34px;
+}
+.footer-brand .brand-type > span {
+  font-size: 27px;
+}
+.footer-brand .brand-type > small {
+  font-size: 6px;
+  letter-spacing: 1.2px;
+}
+.mobile-menu > button {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+@media (max-width: 1200px) {
+  .header-inner {
+    width: calc(100% - 64px);
+    gap: 15px;
+  }
+  .desktop-nav > a,
+  .desktop-nav > button {
+    padding: 0 10px;
+    font-size: 10px;
+  }
+  .host-link {
+    display: none;
+  }
+  .brand-type > span {
+    font-size: 29px;
+  }
+  .brand-type > small {
+    font-size: 6px;
+  }
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+  .header-actions {
+    gap: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .desktop-nav > a,
+  .desktop-nav > button {
+    font-size: 9px;
+    padding: 0 9px;
+  }
+  .desktop-nav {
+    height: 42px;
+  }
+  .desktop-nav > a,
+  .desktop-nav > button {
+    height: 32px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .header-divider {
+    display: none;
+  }
+  .brand-type > small {
+    display: none;
+  }
+  .logo-refined {
+    gap: 8px;
+  }
+  .brand-type > span {
+    font-size: 27px;
+  }
+  .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+}
+@media (max-width: 640px) {
+  .header {
+    height: 77px;
+  }
+  .header-inner {
+    width: calc(100% - 36px);
+    gap: 10px;
+  }
+  .desktop-nav {
+    display: none;
+  }
+  .logo-refined {
+    gap: 9px;
+  }
+  .brand-type {
+    gap: 5px;
+  }
+  .brand-type > span {
+    font-size: 28px;
+  }
+  .brand-type > small {
+    display: block;
+    font-size: 5.5px;
+    letter-spacing: 1px;
+  }
+  .brand-mark {
+    width: 37px;
+    height: 37px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+  .theme-button {
+    height: 35px;
+    min-height: 35px;
+    width: 35px;
+  }
+  .mobile-toggle {
+    height: 40px;
+    min-height: 40px;
+    width: 27px;
+  }
+  .language-button {
+    font-size: 9px;
+    gap: 4px;
+  }
+  .language-button > svg:first-child {
+    width: 14px;
+  }
+  .mobile-menu {
+    top: 76px;
+  }
+  .footer-brand .brand-mark {
+    height: 34px;
+    width: 34px;
+  }
+  .footer-brand .brand-type > span {
+    font-size: 28px;
+  }
+}

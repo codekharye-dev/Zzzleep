@@ -61,3 +61,22 @@ test("all interface translations have key parity", () => {
       Object.keys(translations.az).sort(),
     );
 });
+
+test("five country collections contain 40 unique, localized stays", async () => {
+  const { catalog, countries } = await import("../src/countries.ts");
+  assert.equal(countries.length, 5);
+  assert.equal(catalog.length, 40);
+  assert.equal(new Set(catalog.map((l) => l.id)).size, 40);
+  for (const country of countries) {
+    assert.equal(
+      catalog.filter((l) => l.country === country.code).length,
+      country.code === "AZ" ? 24 : 4,
+    );
+    assert.ok(
+      existsSync(new URL(`../public${country.image}`, import.meta.url)),
+    );
+  }
+  for (const l of catalog) {
+    for (const lang of ["az", "en", "ru"]) assert.ok(l.title[lang]);
+  }
+});

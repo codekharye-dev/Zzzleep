@@ -2,6 +2,7 @@ export type LocalizedText = { az: string; en: string; ru: string };
 export type StayType = "cabin" | "villa" | "apartment" | "cottage" | "tiny";
 export interface Listing {
   id: string;
+  country: "AZ" | "TR" | "US" | "IT" | "JP";
   title: LocalizedText;
   city: string;
   area: string;
@@ -573,6 +574,7 @@ export const listings: Listing[] = seeds.map(
     images,
     badge,
     description: descriptions[type],
+    country: "AZ",
   }),
 );
 

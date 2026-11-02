@@ -1,0 +1,17 @@
+@import "tailwindcss";
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-muted: var(--soft);
+  --color-muted-foreground: var(--muted);
+  --color-border: var(--line);
+  --color-ring: var(--primary);
+  --color-chart-1: #7762d8;
+  --color-chart-2: #36978e;
+  --color-chart-3: #d09164;
+  --color-chart-4: #c8a64b;
+  --color-chart-5: #718bca;
+}

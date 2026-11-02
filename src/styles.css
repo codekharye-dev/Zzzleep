@@ -2645,3 +2645,4 @@ svg {
 [data-theme="dark"] .btn-primary,
 [data-theme="dark"] .search-submit,
 [data-theme="dark"] .email-input > button { color: #19132e; }
+.stay-meta>span:first-child{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.stay-meta>span:first-child>svg{display:inline-block;vertical-align:middle;margin-right:4px}.stay-meta .stay-rating{flex-shrink:0}

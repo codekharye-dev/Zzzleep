@@ -16,7 +16,7 @@ Sayt Azərbaycan dilində açılır. Dil və açıq/qaranlıq rejim seçimi brau
 
 ## Hazır funksiyalar
 
-- 6 şəhər üzrə 24 farazi ev, villa və mənzil; AZ/EN/RU interfeys və məkan təsvirləri.
+- 5 ölkə üzrə 40 farazi məkan: Azərbaycanda 24, Türkiyə, ABŞ, İtaliya və Yaponiyada hərəsində 4; AZ/EN/RU interfeys və məkan təsvirləri.
 - Şəhər, qonaq tutumu, yaşayış növü, gecəlik qiymət və imkanlar birlikdə filtrlənir.
 - Qiymət və reytinqə görə sıralama, daha çox nəticə, boş nəticə vəziyyətləri.
 - Şəkil qalereyası, klaviatura ilə keçid, ev sahibi, imkanlar və nümunə rəy.
@@ -31,7 +31,7 @@ Sayt Azərbaycan dilində açılır. Dil və açıq/qaranlıq rejim seçimi brau
 ```sh
 npm test          # Qiymət, tarix, tutum, kataloq və tərcümə yoxlamaları
 npm run build    # TypeScript + production build
-npm run test:e2e # 7 Chromium brauzer sınağı
+npm run test:e2e # 11 Chromium brauzer sınağı
 npm run preview  # Hazır build-i lokal yoxlamaq
 ```
 
@@ -40,7 +40,10 @@ Brauzer sınaqları bu bulud mühitində `/usr/bin/chromium` istifadə edir. Ba�
 ## Struktur
 
 - `src/App.tsx` — naviqasiya, axtarış, filtr, kartlar və səhifə quruluşu.
-- `src/data.ts` — 24 məkan və lokal şəkil mənbələri.
+- `src/data.ts` — 24 Azərbaycan məkanı və lokal şəkil mənbələri.
+- `src/countries.ts` — ölkə məlumatları və 16 beynəlxalq nümunə məkan.
+- `src/WorldDiscovery.tsx`, `src/components/ui/testimonial-globe.tsx` — istifadəçinin təqdim etdiyi komponentdən uyğunlaşdırılmış, Cobe ilə interaktiv qlobus.
+- `src/Logo.tsx`, `src/header.css` — ev, ay və Z motivli brend və naviqasiya.
 - `src/i18n.ts`, `src/content.ts` — üç dildə interfeys mətnləri.
 - `src/ListingDetail.tsx`, `src/booking.ts` — detallı görünüş və sınaq rezervasiyası.
 - `src/Extras.tsx` — müqayisə və büdcə kalkulyatoru.
@@ -54,3 +57,9 @@ Bu frontend nümayiş layihəsidir. Bütün məkanlar, qiymətlər, ev sahiblər
 ## GitHub Pages
 
 `main` budağına push edildikdə `.github/workflows/deploy.yml` saytın yoxlamalarını və build-ini işlədir, sonra GitHub Pages-ə yerləşdirir. Build repo alt yoluna uyğun hazırlanır (`/Zzzleep/`). Workflow Pages-i avtomatik aktivləşdirməyə çalışır. Repozitoriya qaydaları buna icazə verməsə, GitHub-da **Settings → Pages → Source → GitHub Actions** seçin və workflow-u yenidən başladın. Sayt yalnız Actions daxilində deploy addımı uğurla tamamlandıqdan sonra açıq olur. Private repozitoriya üçün GitHub planınız Pages-i dəstəkləməlidir.
+
+## Dünya bölməsi
+
+Qlobus sürüşdürməklə fırlanır; hər ölkənin bayrağı və ya ölkə düyməsi `#/country/TR` kimi ayrıca nəticə görünüşünü açır. Oxlar aktiv ölkə kartını dəyişir; kartdakı keçid həmin ölkənin evlərini göstərir. Ölkə seçimi səhifə yenilənəndə URL vasitəsilə qalır. Xarici məkanlar da filtr, seçilmişlər, müqayisə, rezervasiya və büdcə axınlarında işləyir. Bütün qiymətlər AZN ilədir.
+
+Komponent `src/components/ui` daxilində saxlanır. Özündə React və Cobe xaricində shadcn komponentləri import etmir; əlavə CLI ilə layihəni yenidən yaratmaq tələb olunmur. Tailwind Vite plaqini və `src/globe-theme.css` mövcud dizaynın rənglərinə bağlanır. Qlobus ayrıca JS hissəsi kimi yüklənir və WebGL olmadıqda sadə qlobus təsviri ilə işlək ölkə düymələri qalır. Azaldılmış animasiya seçimində avtomatik fırlanma dayanır; ekran xaricində rəsm dövrəsi pauza edilir. Bayraqlar lokal SVG fayllarıdır.
