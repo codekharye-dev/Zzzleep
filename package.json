@@ -12,7 +12,7 @@
     "api": "node --env-file-if-exists=.env server/index.mjs",
     "start": "NODE_ENV=production node --env-file-if-exists=.env server/index.mjs",
     "admin:create": "node --env-file-if-exists=.env server/create-admin.mjs",
-    "test:api": "node --test tests/admin.test.mjs",
+    "test:api": "node --test tests/admin.test.mjs tests/routing.test.mjs",
     "database:check": "node server/check-database.mjs"
   },
   "dependencies": {

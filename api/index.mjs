@@ -1,3 +1,4 @@
+import { forwardedApiUrl } from "../server/api-routing.mjs";
 import { createApp } from "../server/app.mjs";
 import { getDb } from "../server/db.mjs";
 import { initializeAdmin } from "../server/initialize.mjs";
@@ -18,10 +19,17 @@ const origin =
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:5173");
-export default createApp({
+const app = createApp({
   getDb: readyDb,
   origin,
   production:
     process.env.VERCEL_ENV === "production" ||
     process.env.NODE_ENV === "production",
 });
+
+export default function handler(req, res) {
+  req.url = forwardedApiUrl(req.url || "/");
+  const path = new URL(req.url, "http://localhost").pathname;
+  res.once("finish", () => console.info("API request", {method:req.method,path,status:res.statusCode}));
+  return app(req, res);
+}
