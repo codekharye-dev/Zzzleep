@@ -128,16 +128,18 @@ export default function Admin({
   function save(e: FormEvent) {
     e.preventDefault();
     if (!draft) return;
+    const intent = (e.nativeEvent as SubmitEvent).submitter?.getAttribute("value");
+    const status = intent === "publish" ? "published" : draft.status;
     void run(async () => {
       await api(`/admin/listings${editing ? `/${editing}` : ""}`, {
         method: editing ? "PUT" : "POST",
-        body: JSON.stringify(draft),
+        body: JSON.stringify({...draft, status}),
       });
       setDraft(null);
       setEditing(null);
       await refresh();
       onCatalogChange();
-      setNotice("Elan saxlanıldı. Yalnız yayımlanmış elanlar saytda görünür.");
+      setNotice(status === "published" ? "Elan saxlanıldı və saytda yayımlandı." : "Elan qaralama kimi saxlanıldı. Saytda görünməsi üçün Elanı yayımla düyməsini seçin.");
     });
   }
   function field<K extends keyof Draft>(key: K, value: Draft[K]) {
@@ -512,8 +514,10 @@ export default function Admin({
                       ))}
                     </div>
                   </fieldset>
+                  <p className="admin-muted">{draft.status === "draft" ? "Qaralama elan saytda görünmür. Hazır olduqda Elanı yayımla düyməsini seçin." : "Bu elan saxlandıqdan sonra saytda görünəcək."}</p>
                   <div className="admin-actions">
-                    <button className="btn btn-primary" disabled={busy}>
+                    {draft.status === "draft" && <button className="btn btn-primary" type="submit" name="intent" value="publish" disabled={busy}>Elanı yayımla</button>}
+                    <button className="btn btn-outline" type="submit" name="intent" value="save" disabled={busy}>
                       {busy ? "Saxlanılır…" : "Elanı saxla"}
                     </button>
                     <button

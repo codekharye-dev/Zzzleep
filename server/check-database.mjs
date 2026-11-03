@@ -34,11 +34,17 @@ if (process.env.VERCEL_ENV !== "production") {
     createdId=(await created.json()).listing.id;
     const listed=await request("admin/listings");
     if(listed.status!==200 || !(await listed.json()).listings.some(item=>item.id===createdId)) throw Object.assign(new Error(),{code:"DRAFT_READBACK_FAILED"});
+    const publicResponse=await request("listings");
+    if(publicResponse.status!==200) throw Object.assign(new Error(),{code:"PUBLIC_LISTINGS_FAILED"});
+    const publicItems=(await publicResponse.json()).listings;
+    if(publicItems.some(item=>item.id===createdId)) throw Object.assign(new Error(),{code:"DRAFT_WAS_PUBLIC"});
+    const expectedPublished=await db.collection("listings").find({status:"published"}).sort({createdAt:-1}).limit(500).toArray();
+    if(expectedPublished.some(item=>!publicItems.some(published=>published.id===item.id))) throw Object.assign(new Error(),{code:"PUBLISHED_LISTING_MISSING"});
     const deleted=await request("admin/listings/"+createdId,"DELETE");
     if(deleted.status!==200) throw Object.assign(new Error(),{code:"DRAFT_DELETE_"+deleted.status});
     createdId=undefined;
     await request("auth/logout","POST");
-    console.log("Production routed login, session/profile and MongoDB draft create/read/delete passed.");
+    console.log("Production admin login, draft privacy, published catalog readback and draft CRUD passed.");
   } catch(error) {
     const category=/bad auth|authentication failed|scram/i.test(error?.message || "") ? "DATABASE_CREDENTIALS_REJECTED" : "PRODUCTION_CHECK_FAILED";
     console.error("Production preflight failed.",{category,name:error?.name,code:error?.code});

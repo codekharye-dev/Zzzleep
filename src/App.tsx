@@ -104,7 +104,7 @@ function useStored<T>(key: string, initial: T) {
 function App() {
   const [managedListings, setManagedListings] = useState<Listing[]>([]);
   const [catalogVersion, setCatalogVersion] = useState(0);
-  const listings = [...staticListings, ...managedListings];
+  const listings = [...managedListings, ...staticListings];
   const [lang, setLang] = useStored<Lang>("zzzlep-language", "az");
   const [dark, setDark] = useStored("zzzlep-dark", false);
   const [favorites, setFavorites] = useStored<string[]>("zzzlep-favorites", []);
@@ -312,16 +312,10 @@ function App() {
   }, [worldRequested, route]);
   const countryName = (code: string) =>
     countryFor(code)?.name[safeLang] || code;
-  const availableCities =
-    country.code === "AZ"
-      ? cities
-      : Array.from(
-          new Set(
-            listings
-              .filter((l) => l.country === country.code)
-              .map((l) => l.city),
-          ),
-        );
+  const availableCities = Array.from(new Set([
+    ...(country.code === "AZ" ? cities : []),
+    ...listings.filter((l) => l.country === country.code).map((l) => l.city),
+  ]));
   const is3D = route === "/3d";
   const isSearch = route === "/search" || is3D || !!routeCountry;
   const isHome = route === "/";

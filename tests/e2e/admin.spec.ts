@@ -59,10 +59,8 @@ test("admin login, listing creation, publication and profile UI", async ({
   }
   await page.getByLabel("Şəhər", { exact: true }).fill("Bakı");
   await page.getByLabel("Ərazi", { exact: true }).fill("Mərkəz");
-  await page
-    .getByRole("combobox", { name: "Status", exact: true })
-    .selectOption("published");
-  await page.getByRole("button", { name: "Elanı saxla", exact: true }).click();
+
+  await page.getByRole("button", { name: "Elanı yayımla", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("Elan saxlanıldı");
   await expect(page.locator(".admin-row")).toHaveCount(1);
   await page.getByRole("button", { name: "Profilim", exact: true }).click();
@@ -74,4 +72,6 @@ test("admin login, listing creation, publication and profile UI", async ({
   await page.goto("/#/listing/stay-test");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("New home");
   await expect(page.locator(".detail-gallery")).toBeVisible();
+  await page.goto("/");
+  await expect(page.locator(".stay-title").first()).toHaveText("New home");
 });
