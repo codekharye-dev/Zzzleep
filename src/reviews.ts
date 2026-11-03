@@ -185,6 +185,7 @@ const profiles = [
 const cache = new Map<string, Review[]>();
 /** Stable fictional reviews: the displayed score and the assistant use this exact evidence. */
 export function getListingReviews(id: string): Review[] {
+  if (id.startsWith("model-") || id.startsWith("stay-")) return [];
   if (cache.has(id)) return cache.get(id)!;
   const seed = hash(id),
     tier = seed % 4;

@@ -1,3 +1,4 @@
+import { priceInAZN } from "./currency";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
@@ -51,6 +52,7 @@ import { CompareView, SplitView } from "./Extras";
 import { todayISO, validateBooking } from "./booking";
 import { extraCopy } from "./content";
 import { experienceCopy } from "./experienceContent";
+const Admin = lazy(() => import("./Admin"));
 const Experiences = lazy(() => import("./Experiences"));
 const ExperiencePreview = lazy(() =>
   import("./Experiences").then((module) => ({
@@ -60,7 +62,7 @@ const ExperiencePreview = lazy(() =>
 
 const asset = (path: string) =>
   `${import.meta.env.BASE_URL}${path.replace(/^\//, "")}`;
-const listings: Listing[] = sourceListings.map((listing) => ({
+const staticListings: Listing[] = sourceListings.map((listing) => ({
   ...listing,
   images: listing.images.map(asset),
 }));
@@ -100,11 +102,27 @@ function useStored<T>(key: string, initial: T) {
   return [value, setValue] as const;
 }
 function App() {
+  const [managedListings, setManagedListings] = useState<Listing[]>([]);
+  const [catalogVersion, setCatalogVersion] = useState(0);
+  const listings = [...staticListings, ...managedListings];
   const [lang, setLang] = useStored<Lang>("zzzlep-language", "az");
   const [dark, setDark] = useStored("zzzlep-dark", false);
   const [favorites, setFavorites] = useStored<string[]>("zzzlep-favorites", []);
   const [compared, setCompared] = useStored<string[]>("zzzlep-compared", []);
   const [route, setRoute] = useState(location.hash.slice(1) || "/");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/listings", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const data = await response.json();
+        if (Array.isArray(data.listings)) setManagedListings(data.listings);
+      })
+      .catch(() => {
+        /* Static demo stays remain available when the API is offline. */
+      });
+    return () => controller.abort();
+  }, [route, catalogVersion]);
   const [menu, setMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [worldRequested, setWorldRequested] = useState(false);
@@ -317,15 +335,15 @@ function App() {
         (isFavorites || l.country === country.code) &&
         (!city || l.city === city) &&
         (category === "all" || l.type === category) &&
-        l.price <= maxPrice &&
+        priceInAZN(l) <= maxPrice &&
         l.guests >= guests &&
         amenities.every((a) => l.amenities.includes(a)),
     )
     .sort((a, b) =>
       sort === "low"
-        ? a.price - b.price
+        ? priceInAZN(a) - priceInAZN(b)
         : sort === "high"
-          ? b.price - a.price
+          ? priceInAZN(b) - priceInAZN(a)
           : sort === "rating"
             ? b.rating - a.rating
             : 0,
@@ -448,6 +466,7 @@ function App() {
           <i />
         </div>
       </div>
+      {l.modelId && <span className="model-card-label">3D TOUR</span>}
       <div className="stay-meta">
         <span>
           <MapPin size={13} />
@@ -466,7 +485,9 @@ function App() {
         {l.bedrooms} {t("bedrooms").toLocaleLowerCase(safeLang)}
       </p>
       <div className="stay-price">
-        <strong>{l.price} ₼</strong>
+        <strong>
+          {l.price} {l.currency === "USD" ? "$" : "₼"}
+        </strong>
         <span>/ {t("night")}</span>
         <a href={`#/listing/${l.id}`} aria-label={t("details")}>
           <ArrowUpRight size={19} />
@@ -507,7 +528,7 @@ function App() {
               </a>
             </nav>
             <div className="header-actions">
-              <button className="host-link" onClick={() => setInfo("host")}>
+              <button className="host-link" onClick={() => go("/admin")}>
                 {t("host")}
                 <ArrowUpRight size={15} />
               </button>
@@ -589,7 +610,7 @@ function App() {
               <button
                 onClick={() => {
                   setMenu(false);
-                  setInfo("host");
+                  go("/admin");
                 }}
               >
                 {t("host")}
@@ -1059,6 +1080,11 @@ function App() {
               </section>
             </>
           )}
+          {route === "/admin" && (
+            <Suspense fallback={<p className="container">Yüklənir…</p>}>
+              <Admin onCatalogChange={() => setCatalogVersion((v) => v + 1)} />
+            </Suspense>
+          )}
           {isExperiences && (
             <Suspense fallback={<div className="experience-route-loading" />}>
               <Experiences lang={safeLang} route={route} onNavigate={go} />
@@ -1115,7 +1141,8 @@ function App() {
               <SplitView listings={listings} lang={safeLang} />
             </section>
           )}
-          {!isHome &&
+          {route !== "/admin" &&
+            !isHome &&
             !isSearch &&
             !isFavorites &&
             !isExperiences &&
@@ -1203,10 +1230,11 @@ function App() {
               <h4>{t("footerZzzlep")}</h4>
               <button onClick={() => setInfo("about")}>{t("about")}</button>
               <a href="#/split">{t("split")}</a>
-              <button onClick={() => setInfo("host")}>{t("host")}</button>
+              <button onClick={() => go("/admin")}>{t("host")}</button>
             </div>
             <div className="footer-column">
               <h4>{t("footerSupport")}</h4>
+              <a href="#/admin">Admin</a>
               <button onClick={() => setInfo("faq")}>{t("help")}</button>
               <button onClick={() => setInfo("privacy")}>{t("privacy")}</button>
               <button onClick={() => setInfo("terms")}>{t("terms")}</button>
@@ -1221,7 +1249,7 @@ function App() {
                 : safeLang === "en"
                   ? "Azerbaijan"
                   : "Азербайджан"}{" "}
-              <span>·</span> {isExperiences ? "USD $" : "AZN ₼"}
+              <span>·</span> {isExperiences ? "USD $" : selected?.currency === "USD" ? "USD $" : "AZN ₼"}
             </span>
           </div>
           <div className="demo-notice">

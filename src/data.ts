@@ -3,6 +3,8 @@ export type LocalizedText = { az: string; en: string; ru: string };
 export type StayType = "cabin" | "villa" | "apartment" | "cottage" | "tiny";
 export interface Listing {
   id: string;
+  modelId?: string;
+  currency?: "USD" | "AZN";
   country: "AZ" | "TR" | "US" | "IT" | "JP";
   title: LocalizedText;
   city: string;

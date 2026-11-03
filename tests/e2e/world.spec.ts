@@ -15,11 +15,11 @@ test("country collection opens only that country and survives reload", async ({
     .getByRole("button", { name: "Türkiyə", exact: true })
     .click();
   await expect(page).toHaveURL(/#\/country\/TR$/);
-  await expect(page.locator(".stay-card")).toHaveCount(4);
+  await expect(page.locator(".stay-card")).toHaveCount(8);
   await expect(page.locator(".listings-section h2")).toContainText("Türkiyə");
   await expect(page.locator(".stay-meta").first()).toContainText("Türkiyə");
   await page.reload();
-  await expect(page.locator(".stay-card")).toHaveCount(4);
+  await expect(page.locator(".stay-card")).toHaveCount(8);
   await page
     .getByRole("combobox", { name: "Hara gedirik?" })
     .selectOption("Kaş");
@@ -61,7 +61,7 @@ test("foreign favorites and comparisons include international properties", async
   page,
 }) => {
   await page.goto("/#/country/US");
-  await expect(page.locator(".stay-card")).toHaveCount(4);
+  await expect(page.locator(".stay-card")).toHaveCount(8);
   await page
     .locator(".stay-card")
     .first()
@@ -102,7 +102,7 @@ test("countries remain accessible on mobile in English and Russian without overf
     .getByRole("button", { name: "United States", exact: true })
     .click();
   await expect(page).toHaveURL(/#\/country\/US$/);
-  await expect(page.locator(".stay-card")).toHaveCount(4);
+  await expect(page.locator(".stay-card")).toHaveCount(8);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

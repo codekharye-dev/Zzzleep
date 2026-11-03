@@ -54,7 +54,7 @@ test("search combines city, capacity, category, price and amenities", async ({
     .selectOption("4");
   await page.getByRole("button", { name: "Axtar", exact: true }).click();
   await expect(page).toHaveURL(/#\/search/);
-  await expect(page.locator(".stay-card")).toHaveCount(3);
+  await expect(page.locator(".stay-card")).toHaveCount(4);
   await page.getByRole("button", { name: "Villalar", exact: true }).click();
   await expect(page.locator(".stay-card")).toHaveCount(1);
   await page.getByRole("button", { name: "Filtrlər", exact: true }).click();

@@ -21,6 +21,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - run: npm run test:api
       - run: npm test
       - run: npm run build -- --base="/${{ github.event.repository.name }}/"
       - uses: actions/configure-pages@v5

@@ -62,15 +62,15 @@ test("all interface translations have key parity", () => {
     );
 });
 
-test("five country collections contain 40 unique, localized stays", async () => {
+test("five country collections preserve 40 stays and add 12 modeled demo homes", async () => {
   const { catalog, countries } = await import("../src/countries.ts");
   assert.equal(countries.length, 5);
-  assert.equal(catalog.length, 40);
-  assert.equal(new Set(catalog.map((l) => l.id)).size, 40);
+  assert.equal(catalog.length, 52);
+  assert.equal(new Set(catalog.map((l) => l.id)).size, 52);
   for (const country of countries) {
     assert.equal(
       catalog.filter((l) => l.country === country.code).length,
-      country.code === "AZ" ? 24 : 4,
+      country.code === "AZ" ? 28 : ["TR", "US"].includes(country.code) ? 8 : 4,
     );
     assert.ok(
       existsSync(new URL(`../public${country.image}`, import.meta.url)),

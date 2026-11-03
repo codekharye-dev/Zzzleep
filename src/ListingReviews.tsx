@@ -275,6 +275,13 @@ export default function ListingReviews({
     setExpanded(true);
     setHighlight(id);
   };
+  if (!reviews.length)
+    return (
+      <section className="reviews-section">
+        <h2>{c.total}</h2>
+        <p className="reviews-empty">{c.noReviews}</p>
+      </section>
+    );
   return (
     <div className="listing-reviews">
       <ZlpyAI reviews={reviews} lang={lang} onSource={source} />

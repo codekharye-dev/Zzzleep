@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -30,6 +30,8 @@ import type { Lang } from "./i18n";
 import { addDays, bookingPrice, todayISO, validateBooking } from "./booking";
 import "./detail.css";
 import ListingReviews from "./ListingReviews";
+
+const StayTour = lazy(() => import("./stay3d/StayTour"));
 
 const copy = {
   az: {
@@ -382,6 +384,7 @@ export default function ListingDetail({
             checkOut,
             guests,
             total: price.total,
+            currency: listing.currency || "AZN",
             demo: true,
           },
         ]),
@@ -453,6 +456,15 @@ export default function ListingDetail({
           <Expand size={15} /> {c.allPhotos}
         </button>
       </div>
+      {listing.modelId && (
+        <Suspense fallback={null}>
+          <StayTour
+            key={listing.modelId}
+            modelId={listing.modelId}
+            lang={lang}
+          />
+        </Suspense>
+      )}
       <div className="detail-columns">
         <div className="detail-story">
           <section className="detail-overview">
@@ -528,7 +540,11 @@ export default function ListingDetail({
           <form className="booking-panel" onSubmit={reserve} noValidate>
             <div className="booking-price">
               <span>
-                <b>{money(listing.price)} ₼</b> / {c.night}
+                <b>
+                  {money(listing.price)}{" "}
+                  {listing.currency === "USD" ? "$" : "₼"}
+                </b>{" "}
+                / {c.night}
               </span>
               <span>
                 <Star size={13} fill="currentColor" />{" "}
@@ -596,17 +612,26 @@ export default function ListingDetail({
             <div className="booking-breakdown">
               <div>
                 <span>
-                  {money(listing.price)} ₼ × {price.nights} {c.night}
+                  {money(listing.price)}{" "}
+                  {listing.currency === "USD" ? "$" : "₼"} × {price.nights}{" "}
+                  {c.night}
                 </span>
-                <span>{money(price.subtotal)} ₼</span>
+                <span>
+                  {money(price.subtotal)}{" "}
+                  {listing.currency === "USD" ? "$" : "₼"}
+                </span>
               </div>
               <div>
                 <span>{c.service}</span>
-                <span>{money(price.fee)} ₼</span>
+                <span>
+                  {money(price.fee)} {listing.currency === "USD" ? "$" : "₼"}
+                </span>
               </div>
               <div className="booking-total">
                 <strong>{c.total}</strong>
-                <strong>{money(price.total)} ₼</strong>
+                <strong>
+                  {money(price.total)} {listing.currency === "USD" ? "$" : "₼"}
+                </strong>
               </div>
             </div>
             <p className="booking-demo">{c.demo}</p>
@@ -673,7 +698,10 @@ export default function ListingDetail({
                   </div>
                   <div>
                     <dt>{c.total}</dt>
-                    <dd>{money(price.total)} ₼</dd>
+                    <dd>
+                      {money(price.total)}{" "}
+                      {listing.currency === "USD" ? "$" : "₼"}
+                    </dd>
                   </div>
                 </dl>
                 <div className="booking-reference">

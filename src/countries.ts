@@ -1,3 +1,4 @@
+import { modelListings } from './stay3d/catalog.ts';
 import { reviewedScore } from "./reviews.ts";
 import { listings } from "./data.ts";
 import type { Listing, LocalizedText } from "./data.ts";
@@ -288,6 +289,6 @@ export const internationalListings: Listing[] = seeds.map(
     };
   },
 );
-export const catalog: Listing[] = [...listings, ...internationalListings];
+export const catalog: Listing[] = [...listings, ...internationalListings, ...modelListings];
 export const countryFor = (code: string) =>
   countries.find((country) => country.code === code);

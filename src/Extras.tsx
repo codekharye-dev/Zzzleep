@@ -1,3 +1,4 @@
+import { priceInAZN } from "./currency";
 import { useState } from "react";
 import {
   ArrowRight,
@@ -59,7 +60,7 @@ const copy = {
     fee: "Xidmət haqqı (5%)",
     nights: "gecə",
     priceNote:
-      "Bütün qiymətlər AZN ilədir. Məbləğ seçdiyiniz tarixlər və qonaq sayına görə hesablanır.",
+      "Qiymətlər elanda göstərilən valyutadadır. Məbləğ seçdiyiniz tarixlər və qonaq sayına görə hesablanır.",
     plan: "Səfərin büdcəsi",
     notCharged: "Heç bir ödəniş tələb olunmur",
     demo: "Bu yalnız büdcə hesablamasıdır. Real ödəniş və ya rezervasiya aparılmır.",
@@ -111,7 +112,7 @@ const copy = {
     fee: "Service fee (5%)",
     nights: "nights",
     priceNote:
-      "All prices are in AZN. Your estimate is based on your selected dates and group size.",
+      "Prices use the currency shown on the listing. Your estimate is based on your selected dates and group size.",
     plan: "Your trip budget",
     notCharged: "No payment required",
     demo: "This is a budget estimate only. No actual payment or booking takes place.",
@@ -164,7 +165,7 @@ const copy = {
     fee: "Сервисный сбор (5%)",
     nights: "ночей",
     priceNote:
-      "Все цены указаны в AZN. Расчёт зависит от выбранных дат и размера группы.",
+      "Цены указаны в валюте объявления. Расчёт зависит от выбранных дат и размера группы.",
     plan: "Бюджет поездки",
     notCharged: "Оплата не требуется",
     demo: "Это только расчёт бюджета. Реальная оплата и бронирование не производятся.",
@@ -233,13 +234,13 @@ export function CompareView({
         </button>
       </div>
     );
-  const cheapest = Math.min(...items.map((item) => item.price));
+  const cheapest = Math.min(...items.map(priceInAZN));
   const rows = [
     {
       label: c.price,
       values: items.map((item) => (
         <span className="extras-price" key={item.id}>
-          {money(item.price, lang)} <small>AZN</small>
+          {money(item.price, lang)} <small>{item.currency || "AZN"}</small>
         </span>
       )),
     },
@@ -291,7 +292,7 @@ export function CompareView({
                     >
                       <X size={17} />
                     </button>
-                    {item.price === cheapest && (
+                    {priceInAZN(item) === cheapest && (
                       <span className="extras-value-badge">
                         <Sparkles size={12} />
                         {c.best}
@@ -533,7 +534,8 @@ export function SplitView({
         <div className="extras-per-person">
           <span>{c.perPerson}</span>
           <div aria-live="polite">
-            {error ? "—" : money(perPerson, lang)} <small>AZN</small>
+            {error ? "—" : money(perPerson, lang)}{" "}
+            <small>{listing.currency || "AZN"}</small>
           </div>
           <span>
             {!error && `${nights} ${c.nights} · ${people} ${c.people}`}
@@ -544,22 +546,29 @@ export function SplitView({
             <dt>
               {c.accommodation}
               <small>
-                {money(listing.price, lang)} AZN × {error ? "—" : nights}{" "}
-                {c.nights}
+                {money(listing.price, lang)} {listing.currency || "AZN"} ×{" "}
+                {error ? "—" : nights} {c.nights}
               </small>
             </dt>
-            <dd>{error ? "—" : money(accommodation, lang)} AZN</dd>
+            <dd>
+              {error ? "—" : money(accommodation, lang)}{" "}
+              {listing.currency || "AZN"}
+            </dd>
           </div>
           <div>
             <dt>
               {c.fee}
               <CircleHelp size={13} />
             </dt>
-            <dd>{error ? "—" : money(fee, lang)} AZN</dd>
+            <dd>
+              {error ? "—" : money(fee, lang)} {listing.currency || "AZN"}
+            </dd>
           </div>
           <div className="extras-budget-total">
             <dt>{c.total}</dt>
-            <dd>{error ? "—" : money(total, lang)} AZN</dd>
+            <dd>
+              {error ? "—" : money(total, lang)} {listing.currency || "AZN"}
+            </dd>
           </div>
           <div>
             <dt>{c.splitBy}</dt>
