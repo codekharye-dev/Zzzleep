@@ -278,7 +278,7 @@ function App() {
     }
     setSearchError("");
     setLimit(8);
-    go(route.startsWith("/country/") ? route : "/search");
+    go(route === "/3d" || route.startsWith("/country/") ? route : "/search");
   };
   const isFavorites = route === "/favorites";
   const routeCountry = route.startsWith("/country/")
@@ -322,7 +322,8 @@ function App() {
               .map((l) => l.city),
           ),
         );
-  const isSearch = route === "/search" || !!routeCountry;
+  const is3D = route === "/3d";
+  const isSearch = route === "/search" || is3D || !!routeCountry;
   const isHome = route === "/";
   const isExperiences =
     route === "/experiences" ||
@@ -332,7 +333,8 @@ function App() {
     .filter(
       (l) =>
         (!isFavorites || favorites.includes(l.id)) &&
-        (isFavorites || l.country === country.code) &&
+        (isFavorites || is3D || l.country === country.code) &&
+        (!is3D || !!l.modelId) &&
         (!city || l.city === city) &&
         (category === "all" || l.type === category) &&
         priceInAZN(l) <= maxPrice &&
@@ -517,6 +519,7 @@ function App() {
                 <Globe2 size={14} />
                 {worldCopy[safeLang].nav}
               </button>
+              <a href="#/3d" className={is3D ? "active" : ""} onClick={() => reset()}>3D</a>
               <a className={isFavorites ? "active" : ""} href="#/favorites">
                 {t("favorites")}
                 {favorites.length > 0 && (
@@ -595,6 +598,7 @@ function App() {
           {menu && (
             <nav className="mobile-menu" onClick={() => setMenu(false)}>
               <a href="#/">{t("discover")}</a>
+              <a href="#/3d" onClick={() => reset()}>3D</a>
               <a href="#/experiences">{experienceCopy[safeLang].nav}</a>
               <button onClick={openWorld}>
                 <Globe2 size={16} />
@@ -697,6 +701,7 @@ function App() {
               </section>
             </>
           )}
+          {isHome && <aside className="home-tour-entry container"><div><strong>{safeLang === "az" ? "Evi seçməzdən əvvəl içini gəz." : safeLang === "en" ? "Step inside before you choose." : "Загляните внутрь перед выбором."}</strong><span>{safeLang === "az" ? "12 demo ev · İnteraktiv otaqlar · 3D plan" : safeLang === "en" ? "12 demo homes · Interactive rooms · 3D plans" : "12 демо-домов · Комнаты · 3D-планы"}</span></div><a className="btn btn-primary" href="#/3d" onClick={() => reset()}>{safeLang === "az" ? "3D evləri kəşf et" : safeLang === "en" ? "Explore 3D homes" : "Дома в 3D"}<ArrowUpRight size={17}/></a></aside>}
           {(isHome || isSearch) && (
             <section
               className={`search-section container ${isSearch ? "search-page-bar" : ""}`}
@@ -846,7 +851,7 @@ function App() {
                     {isFavorites
                       ? t("savedTitle")
                       : isSearch
-                        ? `${city ? cityName(city) : country.name[safeLang]} · ${result.length} ${t("results")}`
+                        ? `${is3D ? "3D TOUR" : city ? cityName(city) : country.name[safeLang]} · ${result.length} ${t("results")}`
                         : t("staysTitle")}
                   </h2>
                   <p>

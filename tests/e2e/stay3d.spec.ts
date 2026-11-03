@@ -58,3 +58,14 @@ test("3D tour fits mobile and translates controls", async ({ page }) => {
   );
   expect(overflow).toBe(false);
 });
+
+test('homepage visibly links to the dedicated 3D catalog',async ({page}) => {
+ await page.goto('/');
+ await page.getByRole('link',{name:'3D evləri kəşf et',exact:true}).click();
+ await expect(page).toHaveURL(/#\/3d$/);
+ await expect(page.locator('.listings-section h2')).toContainText('3D TOUR');
+ await expect(page.locator('.stay-card')).toHaveCount(8);
+ await expect(page.locator('.model-card-label')).toHaveCount(8);
+ await page.locator('.stay-title').first().click();
+ await expect(page.getByRole('button',{name:'3D baxışı aç',exact:true})).toBeVisible();
+});
