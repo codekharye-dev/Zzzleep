@@ -200,7 +200,8 @@ export function createApp({
       return res.status(400).json({ error: "VALIDATION" });
     if (error.type === "entity.too.large")
       return res.status(413).json({ error: "PAYLOAD_TOO_LARGE" });
-    // Do not send driver errors or connection strings to the browser or logs.
+    // Log only a safe category/code; never driver messages or connection strings.
+    console.error("API operation failed", {name:error?.name, code:error?.code});
     res.status(503).json({ error: "SERVICE_UNAVAILABLE" });
   });
   return app;
