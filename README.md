@@ -103,3 +103,9 @@ Server Node.js 24+ tələb edir. GitHub Pages Node serverini işlətmir; oradak�
 `npm run test:api` autentifikasiya/CRUD/validasiya testlərini izolyasiya edilmiş yaddaş adapterində işlədir; bu test canlı Atlas bağlantısını təsdiqləmir. `GET /api/health` real DB ping edir. Bu iş mühitində canlı Atlas sınağı `ECONNREFUSED` ilə nəticələnib; admin hesabının canlı bazada yaradılması və davamlı saxlanma hələ təsdiqlənməyib.
 
 Qiymət filtri və “ən ucuz” müqayisəsi AZN əsasında işləyir; USD demo qiymətləri müqayisə üçün sabit 1.7 əmsalı ilə hesablanır. Bu canlı valyuta xidməti deyil. Elan və büdcə məbləğləri öz valyutası ilə göstərilir.
+
+### Vercel-də canlı admin
+
+`api/index.mjs` Express API-ni Vercel Function kimi işlədər; `vercel.json` `/api/*` sorğularını həmin funksiyaya yönləndirir. Sayt və API eyni Vercel domenində olmalıdır. Server env dəyişənləri: `MONGODB_URI`, `MONGODB_DB`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (12+ simvol), `ADMIN_NAME` və dəqiq production ünvanı olan `APP_ORIGIN`. Baza və admin şifrələri fərqli olmalıdır.
+
+Funksiya ilk API sorğusunda server env-dən admin hesabını və indeksləri təhlükəsiz, təkrarlana bilən şəkildə yaradır; ictimai qeydiyyat və ya bootstrap endpoint-i yoxdur. Mövcud hesabın şifrəsi/rolu dəyişdirilmir. Env dəyişikliklərindən sonra redeploy tələb olunur. Atlas həmin hostinqdən bağlantıya icazə verməlidir. `GET /api/health` uğurlu cavab verdikdən sonra `#/admin` girişini və bir qaralama elanın yaradılıb yenidən açılmasını yoxlayın.

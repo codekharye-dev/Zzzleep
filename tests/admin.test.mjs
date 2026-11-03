@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createApp } from "../server/app.mjs";
-import { hashPassword } from "../server/auth.mjs";
+import { initializeAdmin } from "../server/initialize.mjs";
+import { hashPassword, verifyPassword } from "../server/auth.mjs";
 import { validateListing } from "../server/validation.mjs";
 const origin = "http://localhost:5173";
 const sample = {
@@ -32,6 +33,7 @@ function memoryDb() {
       if (!tables.has(name)) tables.set(name, []);
       const rows = tables.get(name);
       return {
+        async createIndex() { return "test-index"; },
         async findOne(q) {
           return rows.find((r) => matches(r, q));
         },
@@ -45,8 +47,9 @@ function memoryDb() {
           rows.splice(i, 1);
           return { deletedCount: 1 };
         },
-        async updateOne(q, update) {
+        async updateOne(q, update, options = {}) {
           const item = rows.find((r) => matches(r, q));
+          if (!item && options.upsert) { rows.push({...q,...update.$setOnInsert}); return {upsertedCount:1}; }
           if (item) Object.assign(item, update.$set);
           return { modifiedCount: item ? 1 : 0 };
         },
@@ -190,4 +193,19 @@ test("validation rejects executable image URLs, unknown models and malformed loc
     { guests: 1.5 },
   ])
     assert.throws(() => validateListing({ ...sample, ...invalid }));
+});
+
+test('cold-start admin initialization is repeatable and preserves existing credentials and roles',async()=>{
+ const db=memoryDb();
+ const env={ADMIN_EMAIL:'Admin@Example.com',ADMIN_PASSWORD:'initial-password-123',ADMIN_NAME:'Owner'};
+ assert.deepEqual(await initializeAdmin(db,env),{created:true});
+ const original=await db.collection('users').findOne({email:'admin@example.com'});
+ assert.equal(original.role,'admin');assert.equal(await verifyPassword(env.ADMIN_PASSWORD,original.passwordHash),true);
+ assert.deepEqual(await initializeAdmin(db,{...env,ADMIN_PASSWORD:'changed-password-123'}),{created:false});
+ assert.equal(db.tables.get('users').length,1);
+ assert.equal(await verifyPassword(env.ADMIN_PASSWORD,original.passwordHash),true);
+ await db.collection('users').insertOne({email:'member@example.com',role:'member',passwordHash:'unchanged'});
+ await initializeAdmin(db,{...env,ADMIN_EMAIL:'member@example.com'});
+ assert.equal((await db.collection('users').findOne({email:'member@example.com'})).role,'member');
+ await assert.rejects(initializeAdmin(db,{...env,ADMIN_PASSWORD:'short'}));
 });
