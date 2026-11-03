@@ -13,7 +13,8 @@ if (process.env.VERCEL_ENV !== 'production') {
   if (!user || !await verifyPassword(process.env.ADMIN_PASSWORD,user.passwordHash)) throw Object.assign(new Error(),{code:'ADMIN_CREDENTIALS_MISMATCH'});
   console.log('Production database ping, persisted admin and password verification passed.');
  } catch(error) {
-  console.error('Production database preflight failed.',{name:error?.name,code:error?.code});
+  const category = /bad auth|authentication failed|scram/i.test(error?.message || '') ? 'DATABASE_CREDENTIALS_REJECTED' : /not authorized/i.test(error?.message || '') ? 'DATABASE_PERMISSIONS_REJECTED' : 'DATABASE_CONNECTION_FAILED';
+  console.error('Production database preflight failed.',{category,name:error?.name,code:error?.code});
   process.exitCode=1;
  } finally {await closeDb();}
 }
